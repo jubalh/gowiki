@@ -16,10 +16,9 @@ type Page struct {
 }
 
 var (
-	templates = template.Must(template.ParseFiles("edit.html", "view.html"))
+	templates = template.Must(template.ParseGlob("tmpl/*.html"))
 	validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
-
-	addr = flag.Bool("addr", false, "find open adress and print final-port.txt")
+	addr      = flag.Bool("addr", false, "find open adress and print final-port.txt")
 )
 
 func (p *Page) save() error {
@@ -81,10 +80,6 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.Handl
 }
 
 func main() {
-	//p1 := &Page{Title: "MyPage", Body: []byte("A page, is here.")}
-	//p1.save()
-	//p2, _ := loadPage("MyPage")
-	//fmt.Println(string(p2.Body))
 	http.HandleFunc("/view/", makeHandler(viewHandler))
 	http.HandleFunc("/edit/", makeHandler(editHandler))
 	http.HandleFunc("/save/", makeHandler(saveHandler))
