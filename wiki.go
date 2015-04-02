@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -15,6 +16,8 @@ type Page struct {
 	Body  []byte
 }
 
+const dataDir = "data"
+
 var (
 	templates = template.Must(template.ParseGlob("tmpl/*.html"))
 	validPath = regexp.MustCompile("^/((edit|save|view)/([a-zA-Z0-9]+))|(FrontPage.html)$")
@@ -22,12 +25,12 @@ var (
 )
 
 func (p *Page) save() error {
-	filename := p.Title + ".txt"
+	filename := dataDir + "/" + p.Title + ".txt"
 	return ioutil.WriteFile(filename, p.Body, 0600)
 }
 
 func loadPage(title string) (*Page, error) {
-	filename := title + ".txt"
+	filename := dataDir + "/" + title + ".txt"
 	body, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -70,7 +73,7 @@ func saveHandler(w http.ResponseWriter, r *http.Request, title string) {
 }
 
 func frontPageHandler(w http.ResponseWriter, r *http.Request, title string) {
-	entries, err := ioutil.ReadDir("tmpl")
+	entries, err := ioutil.ReadDir(dataDir)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -88,7 +91,7 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.Handl
 			fmt.Println("No match found for:", r.URL.Path)
 			return
 		}
-		fn(w, r, m[2])
+		fn(w, r, m[3])
 	}
 }
 
