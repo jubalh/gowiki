@@ -17,7 +17,7 @@ type Page struct {
 
 var (
 	templates = template.Must(template.ParseGlob("tmpl/*.html"))
-	validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
+	validPath = regexp.MustCompile("^/((edit|save|view)/([a-zA-Z0-9]+))|(FrontPage.html)$")
 	addr      = flag.Bool("addr", false, "find open adress and print final-port.txt")
 )
 
@@ -69,10 +69,23 @@ func saveHandler(w http.ResponseWriter, r *http.Request, title string) {
 	http.Redirect(w, r, "/view/"+title, http.StatusFound)
 }
 
+func frontPageHandler(w http.ResponseWriter, r *http.Request, title string) {
+	entries, err := ioutil.ReadDir("tmpl")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	err = templates.ExecuteTemplate(w, "FrontPage.html", entries)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	//http.Redirect(w, r, "/view/FrontPage", http.StatusFound)
+}
+
 func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		m := validPath.FindStringSubmatch(r.URL.Path)
 		if m == nil {
+			fmt.Println("No match found for:", r.URL.Path)
 			return
 		}
 		fn(w, r, m[2])
@@ -83,6 +96,7 @@ func main() {
 	http.HandleFunc("/view/", makeHandler(viewHandler))
 	http.HandleFunc("/edit/", makeHandler(editHandler))
 	http.HandleFunc("/save/", makeHandler(saveHandler))
+	http.HandleFunc("/", makeHandler(frontPageHandler))
 
 	if *addr {
 		l, err := net.Listen("tcp", "127.0.0.1:0")
