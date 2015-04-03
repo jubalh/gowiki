@@ -81,11 +81,15 @@ func frontPageHandler(w http.ResponseWriter, r *http.Request, title string) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	//http.Redirect(w, r, "/view/FrontPage", http.StatusFound)
+	http.Redirect(w, r, "/view/FrontPage", http.StatusFound)
 }
 
 func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/" {
+			http.Redirect(w, r, "/tmpl/FrontPage.html", http.StatusFound)
+			return
+		}
 		m := validPath.FindStringSubmatch(r.URL.Path)
 		if m == nil {
 			fmt.Println("No match found for:", r.URL.Path)
