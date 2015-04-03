@@ -1,5 +1,17 @@
-<h1>{{.Title}}</h1>
+<!DOCTYPE html>
+<html>
 
-<p>[<a href="/edit/{{.Title}}">edit</a>]</p>
+	<head>
+		<title>Gowiki</title>
+		<meta charset="UTF-8" />
 
-<div>{{printf "%s" .Body}}</div>
+	</head>
+
+	<body>
+		<h1>{{.Title}}</h1>
+
+		<p>[<a href="/edit/{{.Title}}">edit</a>]</p>
+
+		<div>{{printf "%s" .Body}}</div>
+	</body>
+</html>
