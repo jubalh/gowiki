@@ -104,7 +104,8 @@ func main() {
 	http.HandleFunc("/edit/", makeHandler(editHandler))
 	http.HandleFunc("/save/", makeHandler(saveHandler))
 	http.HandleFunc("/", makeHandler(frontPageHandler))
-	http.Handle("/static/", http.FileServer(http.Dir("static")))
+
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	if *addr {
 		l, err := net.Listen("tcp", "127.0.0.1:0")
