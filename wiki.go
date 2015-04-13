@@ -68,6 +68,7 @@ func saveHandler(w http.ResponseWriter, r *http.Request, title string) {
 	err := p.save()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	http.Redirect(w, r, "/view/"+title, http.StatusFound)
 }
@@ -76,12 +77,12 @@ func frontPageHandler(w http.ResponseWriter, r *http.Request, title string) {
 	entries, err := ioutil.ReadDir(dataDir)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	err = templates.ExecuteTemplate(w, "FrontPage.html", entries)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	http.Redirect(w, r, "/view/FrontPage", http.StatusFound)
 }
 
 func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
