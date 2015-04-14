@@ -73,7 +73,11 @@ func saveHandler(w http.ResponseWriter, r *http.Request, title string) {
 	http.Redirect(w, r, "/view/"+title, http.StatusFound)
 }
 
-func frontPageHandler(w http.ResponseWriter, r *http.Request, title string) {
+func frontPageHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
 	entries, err := ioutil.ReadDir(dataDir)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -87,10 +91,6 @@ func frontPageHandler(w http.ResponseWriter, r *http.Request, title string) {
 
 func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/" {
-			http.Redirect(w, r, "/tmpl/FrontPage.html", http.StatusFound)
-			return
-		}
 		m := validPath.FindStringSubmatch(r.URL.Path)
 		if m == nil {
 			fmt.Println("No match found for:", r.URL.Path)
@@ -104,7 +104,7 @@ func main() {
 	http.HandleFunc("/view/", makeHandler(viewHandler))
 	http.HandleFunc("/edit/", makeHandler(editHandler))
 	http.HandleFunc("/save/", makeHandler(saveHandler))
-	http.HandleFunc("/", makeHandler(frontPageHandler))
+	http.HandleFunc("/", frontPageHandler)
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
