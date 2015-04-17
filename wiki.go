@@ -38,12 +38,25 @@ func loadPage(title string) (*Page, error) {
 	return &Page{Title: title, Body: body}, nil
 }
 
+func replacePageNames(text []byte) []byte {
+	pageName := string(text[1 : len(text)-1])
+	s := "<a href=\"/view/" + pageName + "\">" + pageName + "</a>"
+	return []byte(s)
+}
+
 func viewHandler(w http.ResponseWriter, r *http.Request, title string) {
 	p, err := loadPage(title)
 	if err != nil {
 		http.Redirect(w, r, "/edit/"+title, http.StatusFound)
 		return
 	}
+
+	regex, _ := regexp.Compile(`\[([a-zA-Z0-9]+)\]`)
+	//regex, _ := regexp.Compile(`\[.*\]`)
+	s := regex.ReplaceAllFunc(p.Body, replacePageNames)
+	fmt.Println(string(s))
+	p.Body = []byte(s)
+
 	renderTemplate(w, "view", p)
 }
 
