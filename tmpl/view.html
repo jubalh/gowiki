@@ -9,10 +9,9 @@
 	</head>
 
 	<body>
+		<p><a href="/">Index </a> | <a href="/edit/{{.Title}}">Edit this page</a></p>
+		<hr>
 		<h1>{{.Title}}</h1>
-
-		<p>[<a href="/edit/{{.Title}}">edit</a>]</p>
-
-		<div>{{printf "%s" .Body}}</div>
+		<div><pre>{{printf "%s" .Body}}</pre></div>
 	</body>
 </html>
