@@ -38,9 +38,17 @@ func loadPage(title string) (*Page, error) {
 	return &Page{Title: title, Body: body}, nil
 }
 
+func dostuff(args ...interface{}) string {
+	return "yeaho"
+	//replace it with a html link in here
+}
+
 func replacePageNames(text []byte) []byte {
+	//pageName := string(text[1 : len(text)-1])
+	//s := "<a href=\"/view/" + pageName + "\">" + pageName + "</a>"
+	//return []byte(s)
 	pageName := string(text[1 : len(text)-1])
-	s := "<a href=\"/view/" + pageName + "\">" + pageName + "</a>"
+	s := "{{" + pageName + " | dostuff}}"
 	return []byte(s)
 }
 
@@ -69,6 +77,7 @@ func editHandler(w http.ResponseWriter, r *http.Request, title string) {
 }
 
 func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
+	templates.Funcs(template.FuncMap{"dostuff": dostuff})
 	err := templates.ExecuteTemplate(w, tmpl+".html", p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
