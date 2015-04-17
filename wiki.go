@@ -3,12 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"html/template"
 	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"regexp"
+	"text/template"
 )
 
 type Page struct {
